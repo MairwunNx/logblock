@@ -1,5 +1,12 @@
 # Changelog
+All notable changes to this project will be documented in this file.
 
-I have several branches for this modification on this, this file contains only links to the change logs for each version of the modification.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-#### [Forge 1.14.4](https://github.com/MairwunNx/logblock/blob/FORGE-1.14.4/changelog.md)
+## [Unreleased]
+
+## [1.14.4-1.0.0] - 2020-02-18
+
+### Added
+- Initial release for 1.14.4 forge.

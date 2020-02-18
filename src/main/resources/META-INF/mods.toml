@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[28,)"
+issueTrackerURL="https://github.com/MairwunNx/logblock/issues"
+
+[[mods]]
+    modId="logblock"
+    version="1.14.4-1.0.0"
+    displayName="logblock"
+    authors="MairwunNx (Pavel Erokhin)"
+    updateJSONURL="https://raw.githubusercontent.com/MairwunNx/logblock/FORGE-1.14.4/update.json"
+    displayURL="https://github.com/MairwunNx/logblock"
+    description='''
+    ...
+    '''
+
+[[dependencies.projectessentials]]
+    modId="forge"
+    mandatory=true
+    versionRange="[28,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.projectessentials]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.14.4]"
+    ordering="NONE"
+    side="BOTH"

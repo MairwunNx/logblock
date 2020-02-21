@@ -7,8 +7,10 @@ import com.mairwunnx.logblock.source.BreakSource
 import com.mairwunnx.logblock.source.FireSource
 import com.mairwunnx.logblock.source.PlaceSource
 import com.mairwunnx.logblock.source.UseSource
+import net.minecraft.block.Blocks
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.item.Items
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent
 import net.minecraftforge.event.world.BlockEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -22,35 +24,12 @@ class EntryPoint {
 
     init {
         printStartupMessage()
+        MinecraftForge.EVENT_BUS.register(this)
         init()
-
-        log(
-            PlayerMetaData(
-                "0", "dasd", Position(0.0, 0.0, 0.0), WorldInfo(
-                    0, "0"
-                ), BreakWorldEvent(
-                    BreakSource(
-                        Position(0.0, 0.0, 0.0), "dsd", "qqq"
-                    )
-                )
-            )
-        )
-
-        log(
-            PlayerMetaData(
-                "asdsad", "asddwq", Position(0.0, 0.0, 0.0), WorldInfo(
-                    0, "0"
-                ), BreakWorldEvent(
-                    BreakSource(
-                        Position(0.0, 0.0, 0.0), "dsd", "qqq"
-                    )
-                )
-            )
-        )
     }
 
     private fun printStartupMessage() = logger.info(
-        "\n\n-----------------------< LogBlock by MairwunNx >-----------------------\n".plus(
+        "\n\n-----------------------< LogBlock by MairwunNx >-----------------------\n\n".plus(
             "       keep track of almost everything on your server.\n\n"
         ).plus(
             "       LogBlock mod version: 1.0.0\n"
@@ -79,11 +58,12 @@ class EntryPoint {
             val pos = Position(player.posX, player.posY, player.posZ)
             val world = WorldInfo(player.dimension.id, player.dimension.registryName.toString())
             val usedItem = event.resultStack.item
-            val worldEvent = if (usedItem == Items.FLINT_AND_STEEL) {
-                FireWorldEvent(FireSource(pos, usedItem.name.string))
-            } else {
-                UseWorldEvent(UseSource(usedItem.name.string))
-            }
+            val worldEvent =
+                if (usedItem == Items.FLINT_AND_STEEL || usedItem == Items.FIRE_CHARGE) {
+                    FireWorldEvent(FireSource(pos, usedItem.name.string))
+                } else {
+                    UseWorldEvent(UseSource(usedItem.name.string))
+                }
 
             log(PlayerMetaData(ip, name, pos, world, worldEvent))
         }
@@ -97,14 +77,23 @@ class EntryPoint {
             val name = player.name.string
             val pos = Position(player.posX, player.posY, player.posZ)
             val world = WorldInfo(player.dimension.id, player.dimension.registryName.toString())
-            val worldEvent = PlaceWorldEvent(
-                PlaceSource(
-                    Position(
-                        event.pos.x.toDouble(), event.pos.y.toDouble(), event.pos.z.toDouble()
-                    ),
-                    event.placedBlock.block.registryName.toString()
-                )
-            )
+            val worldEvent =
+                if (event.placedBlock.block == Blocks.FIRE) {
+                    FireWorldEvent(
+                        FireSource(pos, player.activeItemStack.displayName.unformattedComponentText)
+                    )
+                } else {
+                    PlaceWorldEvent(
+                        PlaceSource(
+                            Position(
+                                event.pos.x.toDouble(),
+                                event.pos.y.toDouble(),
+                                event.pos.z.toDouble()
+                            ),
+                            event.placedBlock.block.registryName.toString()
+                        )
+                    )
+                }
 
             log(PlayerMetaData(ip, name, pos, world, worldEvent))
         }

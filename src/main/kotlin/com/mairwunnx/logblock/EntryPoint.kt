@@ -10,6 +10,7 @@ import com.mairwunnx.logblock.source.UseSource
 import net.minecraft.block.Blocks
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.item.Items
+import net.minecraft.util.Hand
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent
 import net.minecraftforge.event.world.BlockEvent
@@ -50,14 +51,14 @@ class EntryPoint {
     }
 
     @SubscribeEvent
-    fun onItemUse(event: LivingEntityUseItemEvent.Finish) {
+    fun onItemUse(event: LivingEntityUseItemEvent.Start) {
         if (event.entity is ServerPlayerEntity) {
             val player = event.entity as ServerPlayerEntity
             val ip = player.playerIP
             val name = player.name.string
             val pos = Position(player.posX, player.posY, player.posZ)
             val world = WorldInfo(player.dimension.id, player.dimension.registryName.toString())
-            val usedItem = event.resultStack.item
+            val usedItem = event.item.item
             val worldEvent =
                 if (usedItem == Items.FLINT_AND_STEEL || usedItem == Items.FIRE_CHARGE) {
                     FireWorldEvent(FireSource(pos, usedItem.name.string))
@@ -79,9 +80,7 @@ class EntryPoint {
             val world = WorldInfo(player.dimension.id, player.dimension.registryName.toString())
             val worldEvent =
                 if (event.placedBlock.block == Blocks.FIRE) {
-                    FireWorldEvent(
-                        FireSource(pos, player.activeItemStack.displayName.unformattedComponentText)
-                    )
+                    FireWorldEvent(FireSource(pos, getCurrentItemName(player)))
                 } else {
                     PlaceWorldEvent(
                         PlaceSource(
@@ -111,11 +110,18 @@ class EntryPoint {
                 Position(
                     event.pos.x.toDouble(), event.pos.y.toDouble(), event.pos.z.toDouble()
                 ),
-                event.player.activeItemStack.displayName.unformattedComponentText,
+                getCurrentItemName(player),
                 event.world.getBlockState(event.pos).block.registryName.toString()
             )
         )
 
         log(PlayerMetaData(ip, name, pos, world, worldEvent))
     }
+
+    private fun getCurrentItemName(player: ServerPlayerEntity): String =
+        if (!player.getHeldItem(Hand.MAIN_HAND).isEmpty) {
+            player.getHeldItem(Hand.MAIN_HAND).item.name.string
+        } else {
+            "hand"
+        }
 }

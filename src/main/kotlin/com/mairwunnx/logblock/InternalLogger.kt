@@ -14,6 +14,7 @@ private lateinit var onLogMessage: (String) -> Unit
 private lateinit var onLogClose: () -> Unit
 
 fun init() {
+    File(logDirectory).mkdirs()
     val files = File(logDirectory).listFiles() ?: emptyArray()
 
     purgeLogDir(files)

@@ -66,9 +66,9 @@ class EntryPoint {
             val usedItem = event.item.item
             val worldEvent =
                 if (usedItem == Items.FLINT_AND_STEEL || usedItem == Items.FIRE_CHARGE) {
-                    FireWorldEvent(FireSource(pos, usedItem.name.string))
+                    FireWorldEvent(FireSource(pos, usedItem.registryName.toString()))
                 } else {
-                    UseWorldEvent(UseSource(usedItem.name.string))
+                    UseWorldEvent(UseSource(usedItem.registryName.toString()))
                 }
 
             log(PlayerMetaData(ip, name, pos, world, worldEvent))
@@ -125,7 +125,7 @@ class EntryPoint {
 
     private fun getCurrentItemName(player: ServerPlayerEntity): String =
         if (!player.getHeldItem(Hand.MAIN_HAND).isEmpty) {
-            player.getHeldItem(Hand.MAIN_HAND).item.name.string
+            player.getHeldItem(Hand.MAIN_HAND).item.registryName.toString()
         } else {
             getSettings().emptySlotName
         }

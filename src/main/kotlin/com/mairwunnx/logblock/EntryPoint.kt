@@ -1,17 +1,20 @@
+@file:Suppress("DuplicatedCode")
+
 package com.mairwunnx.logblock
 
-import com.mairwunnx.logblock.metadata.BreakWorldEvent
-import com.mairwunnx.logblock.metadata.PlayerMetaData
-import com.mairwunnx.logblock.metadata.Position
-import com.mairwunnx.logblock.metadata.WorldInfo
+import com.mairwunnx.logblock.metadata.*
 import com.mairwunnx.logblock.source.BreakSource
+import com.mairwunnx.logblock.source.FireSource
+import com.mairwunnx.logblock.source.PlaceSource
+import com.mairwunnx.logblock.source.UseSource
+import net.minecraft.entity.player.ServerPlayerEntity
+import net.minecraft.item.Items
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent
 import net.minecraftforge.event.world.BlockEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent
 import org.apache.logging.log4j.LogManager
-import kotlin.system.measureTimeMillis
 
 @Mod("logblock")
 class EntryPoint {
@@ -69,16 +72,61 @@ class EntryPoint {
 
     @SubscribeEvent
     fun onItemUse(event: LivingEntityUseItemEvent.Finish) {
+        if (event.entity is ServerPlayerEntity) {
+            val player = event.entity as ServerPlayerEntity
+            val ip = player.playerIP
+            val name = player.name.string
+            val pos = Position(player.posX, player.posY, player.posZ)
+            val world = WorldInfo(player.dimension.id, player.dimension.registryName.toString())
+            val usedItem = event.resultStack.item
+            val worldEvent = if (usedItem == Items.FLINT_AND_STEEL) {
+                FireWorldEvent(FireSource(pos, usedItem.name.string))
+            } else {
+                UseWorldEvent(UseSource(usedItem.name.string))
+            }
 
+            log(PlayerMetaData(ip, name, pos, world, worldEvent))
+        }
     }
 
     @SubscribeEvent
     fun onBlockPlace(event: BlockEvent.EntityPlaceEvent) {
+        if (event.entity is ServerPlayerEntity) {
+            val player = event.entity as ServerPlayerEntity
+            val ip = player.playerIP
+            val name = player.name.string
+            val pos = Position(player.posX, player.posY, player.posZ)
+            val world = WorldInfo(player.dimension.id, player.dimension.registryName.toString())
+            val worldEvent = PlaceWorldEvent(
+                PlaceSource(
+                    Position(
+                        event.pos.x.toDouble(), event.pos.y.toDouble(), event.pos.z.toDouble()
+                    ),
+                    event.placedBlock.block.registryName.toString()
+                )
+            )
 
+            log(PlayerMetaData(ip, name, pos, world, worldEvent))
+        }
     }
 
     @SubscribeEvent
     fun onBlockBreakEvent(event: BlockEvent.BreakEvent) {
+        val player = event.player as ServerPlayerEntity
+        val ip = player.playerIP
+        val name = player.name.string
+        val pos = Position(player.posX, player.posY, player.posZ)
+        val world = WorldInfo(player.dimension.id, player.dimension.registryName.toString())
+        val worldEvent = BreakWorldEvent(
+            BreakSource(
+                Position(
+                    event.pos.x.toDouble(), event.pos.y.toDouble(), event.pos.z.toDouble()
+                ),
+                event.player.activeItemStack.displayName.unformattedComponentText,
+                event.world.getBlockState(event.pos).block.registryName.toString()
+            )
+        )
 
+        log(PlayerMetaData(ip, name, pos, world, worldEvent))
     }
 }

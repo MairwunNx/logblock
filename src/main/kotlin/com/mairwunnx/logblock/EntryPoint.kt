@@ -2,6 +2,9 @@
 
 package com.mairwunnx.logblock
 
+import com.mairwunnx.logblock.configuration.getSettings
+import com.mairwunnx.logblock.configuration.loadSettings
+import com.mairwunnx.logblock.configuration.saveSettings
 import com.mairwunnx.logblock.metadata.*
 import com.mairwunnx.logblock.source.BreakSource
 import com.mairwunnx.logblock.source.FireSource
@@ -24,30 +27,32 @@ class EntryPoint {
     private val logger = LogManager.getLogger()
 
     init {
-        printStartupMessage()
+        if (getSettings().printStartMessage) printStartupMessage()
         MinecraftForge.EVENT_BUS.register(this)
-        init()
+        loadSettings()
+        if (getSettings().useEventLogger) initLogger()
     }
 
     private fun printStartupMessage() = logger.info(
         "\n\n-----------------------< LogBlock by MairwunNx >-----------------------\n\n".plus(
-            "       keep track of almost everything on your server.\n\n"
+            "   keep track of almost everything on your server.\n\n"
         ).plus(
-            "       LogBlock mod version: 1.0.0\n"
+            "   LogBlock mod version: 1.0.0\n"
         ).plus(
-            "       Target Minecraft mod loader: Forge\n"
+            "   Target Minecraft mod loader: Forge\n"
         ).plus(
-            "       Forge and Minecraft target version: 28.1.X & 1.14.4\n\n"
+            "   Forge and Minecraft target version: 28.1.X & 1.14.4\n\n"
         ).plus(
-            "       Source code: https://github.com/MairwunNx/logblock\n"
+            "   Source code: https://github.com/MairwunNx/logblock\n"
         ).plus(
-            "       CurseForge: https://www.curseforge.com/minecraft/mc-mods/logblock\n"
+            "   CurseForge: https://www.curseforge.com/minecraft/mc-mods/logblock\n"
         )
     )
 
     @SubscribeEvent
     fun onServerShutdown(event: FMLServerStoppingEvent) {
-        close()
+        closeLogger()
+        saveSettings()
     }
 
     @SubscribeEvent
@@ -122,6 +127,6 @@ class EntryPoint {
         if (!player.getHeldItem(Hand.MAIN_HAND).isEmpty) {
             player.getHeldItem(Hand.MAIN_HAND).item.name.string
         } else {
-            "hand"
+            getSettings().emptySlotName
         }
 }

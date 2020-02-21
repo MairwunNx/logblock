@@ -1,5 +1,6 @@
 package com.mairwunnx.logblock
 
+import com.mairwunnx.logblock.configuration.getSettings
 import com.mairwunnx.logblock.metadata.PlayerMetaData
 import java.io.BufferedWriter
 import java.io.File
@@ -13,7 +14,7 @@ private const val latestLog = "latest.log"
 private lateinit var onLogMessage: (String) -> Unit
 private lateinit var onLogClose: () -> Unit
 
-fun init() {
+fun initLogger() {
     File(logDirectory).mkdirs()
     val files = File(logDirectory).listFiles() ?: emptyArray()
 
@@ -36,6 +37,8 @@ fun init() {
 }
 
 private fun purgeLogDir(files: Array<File>) {
+    if (!getSettings().purgeLogDir) return
+
     files.forEach {
         if (it.isDirectory || it.extension != "log") {
             it.delete()
@@ -62,7 +65,7 @@ private fun doRolling(files: Array<File>) {
         }
     }
 
-    if (files.count() > 20 - 1) {
+    if (files.count() > getSettings().maxLoggerFiles - 1) {
         val lastModifiedDates = mutableListOf<Long>()
         files.forEach {
             if (it.isFile && !it.isDirectory) {
@@ -86,9 +89,9 @@ private fun doRolling(files: Array<File>) {
 fun log(data: PlayerMetaData) = onLogMessage.invoke(format(data))
 
 private fun format(data: PlayerMetaData): String {
-    val dateFormat = SimpleDateFormat("ddMMMyyyy HH:mm:ss.SSS")
+    val dateFormat = SimpleDateFormat(getSettings().dateTimeLogPattern)
     val currentDateTime = dateFormat.format(Date())
-    return "[# $currentDateTime] ${data.format()}"
+    return "[# $currentDateTime] ${if (getSettings().prettyLoggerOut) data.prettyFormat() else data.format()}"
 }
 
-fun close() = onLogClose.invoke()
+fun closeLogger() = onLogClose.invoke()

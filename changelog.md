@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.15.2-1.0.0] - 2020-02-21
+## [1.15.2-1.0.0] - 2020-02-22
 
 ### Added
 - Initial release for 1.15.2 forge.

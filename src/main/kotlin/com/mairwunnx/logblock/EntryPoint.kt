@@ -41,7 +41,7 @@ class EntryPoint {
         ).plus(
             "   Target Minecraft mod loader: Forge\n"
         ).plus(
-            "   Forge and Minecraft target version: 28.1.X & 1.14.4\n\n"
+            "   Forge and Minecraft target version: 31.1.X & 1.15.2\n\n"
         ).plus(
             "   Source code: https://github.com/MairwunNx/logblock\n"
         ).plus(
@@ -61,7 +61,7 @@ class EntryPoint {
             val player = event.entity as ServerPlayerEntity
             val ip = player.playerIP
             val name = player.name.string
-            val pos = Position(player.posX, player.posY, player.posZ)
+            val pos = Position(player.positionVec.x, player.positionVec.y, player.positionVec.z)
             val world = WorldInfo(player.dimension.id, player.dimension.registryName.toString())
             val usedItem = event.item.item
             val worldEvent =
@@ -81,7 +81,7 @@ class EntryPoint {
             val player = event.entity as ServerPlayerEntity
             val ip = player.playerIP
             val name = player.name.string
-            val pos = Position(player.posX, player.posY, player.posZ)
+            val pos = Position(player.positionVec.x, player.positionVec.y, player.positionVec.z)
             val world = WorldInfo(player.dimension.id, player.dimension.registryName.toString())
             val worldEvent =
                 if (event.placedBlock.block == Blocks.FIRE) {
@@ -108,7 +108,7 @@ class EntryPoint {
         val player = event.player as ServerPlayerEntity
         val ip = player.playerIP
         val name = player.name.string
-        val pos = Position(player.posX, player.posY, player.posZ)
+        val pos = Position(player.positionVec.x, player.positionVec.y, player.positionVec.z)
         val world = WorldInfo(player.dimension.id, player.dimension.registryName.toString())
         val worldEvent = BreakWorldEvent(
             BreakSource(
